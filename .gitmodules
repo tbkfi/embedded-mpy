@@ -1,0 +1,4 @@
+[submodule "fw/micropython"]
+	path = fw/micropython
+	url = https://github.com/micropython/micropython.git
+	branch = master
