@@ -1,0 +1,5 @@
+# This file should contain the minimum requirements.
+# Everything else goes into the custom requirements.
+mpremote
+rshell
+pyserial 

@@ -1,5 +1,4 @@
 #!/bin/bash
-D_VENV=".venv"
 BIN_PYTHON=""
 
 
@@ -17,13 +16,19 @@ locate_python() {
 }
 
 setup_venv() {
+# Create or Update the venv
+	local PATH_VENV="./.venv"
+	local PATH_REQ_BASE="./requirements.txt"
+	local PATH_REQ_CUSTOM="./requirements_custom.txt"
+
 	# Virtual Environment
 	echo -n "* Locating venv ... "
-	if [[ ! -d "$D_VENV" ]]; then
+	if [[ ! -d "$PATH_VENV" ]]; then
 		echo "MISSING"
+		
+		echo -n "* Creating virtual environment ... " \
+			&& $BIN_PYTHON -m venv "$PATH_VENV" > /dev/null 2>&1
 
-		echo -n "* Creating virtual environment ... "
-		$BIN_PYTHON -m venv "$D_VENV" > /dev/null 2>&1
 		if (( $? )); then
 			echo "FAIL"
 			exit 1
@@ -33,31 +38,54 @@ setup_venv() {
 	else
 		echo "FOUND"
 	fi
-
+	
 	# Source virtual environment
-	source "$D_VENV/bin/activate"
+	source "$PATH_VENV/bin/activate"
+	
 	if (( $? )); then
 		echo "Failed sourcing VENV! Exiting ..."
 		exit 1
 	fi
 	
 	# PIP Upgrade
-	echo -n "* Upgrading PIP ... " && pip install --upgrade pip > /dev/null 2>&1
+	echo -n "* Upgrading PIP ... " \
+		&& pip install --upgrade pip > /dev/null 2>&1
+	
 	if (( $? )); then
 		echo "ERR"
 	else
 		echo "OK"
 	fi
 	
-	# PIP Install
-	echo -n "* Installing tools ... " && pip install mpremote rshell pyserial > /dev/null 2>&1
-	if (( $? )); then
-		echo "ERR"
+	# PIP Requirements
+	echo -n "* Installing '$PATH_REQ_BASE' ... "
+	if [[ -f "$PATH_REQ_BASE" ]]; then
+		pip install -r "$PATH_REQ_BASE" > /dev/null 2>&1
+	
+		if (( $? )); then
+			echo "ERR"
+		else
+			echo "OK"
+		fi
 	else
-		echo "OK"
+		echo "ERR: MISSING FILE!"
 	fi
 	
-	echo -e "DONE\n"
+	# Requirements
+	echo -n "* Installing '$PATH_REQ_CUSTOM' ... "
+	if [[ -f "$PATH_REQ_CUSTOM" ]]; then
+		pip install -r "$PATH_REQ_CUSTOM" > /dev/null 2>&1
+	
+		if (( $? )); then
+			echo "ERR"
+		else
+			echo "OK"
+		fi
+	else
+		echo "ERR: MISSING FILE!"
+	fi
+
+	echo -e "DONE"
 }
 
 fetch_src() {
@@ -71,15 +99,16 @@ fetch_src() {
 		echo "FOUND"
 	fi
 
-	echo "* Updating submodules ..."
-	git submodule update --init --recursive
+	echo "* Updating submodules ..." \
+		&& git submodule update --init --recursive
+
 	if (( $? )); then
 		echo -e "* UPDATE: FAIL"
 	else
 		echo -e "* UPDATE: OK"
 	fi
 
-	echo -e "DONE\n"
+	echo "DONE"
 }
 
 
@@ -90,4 +119,4 @@ echo -e "\n> Python bin" && locate_python
 echo -e "\n> Virtual Environment" && setup_venv
 echo -e "\n> GIT" && fetch_src
 
-echo "SCRIPT FINISHED"
+echo -e "\nSCRIPT FINISHED"
