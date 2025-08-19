@@ -19,7 +19,7 @@ setup_venv() {
 # Create or Update the venv
 	local PATH_VENV="./.venv"
 	local PATH_REQ_BASE="./requirements.txt"
-	local PATH_REQ_CUSTOM="./requirements_custom.txt"
+	local PATH_REQ_CUSTOM="./src/requirements.txt"
 
 	# Virtual Environment
 	echo -n "* Locating venv ... "
