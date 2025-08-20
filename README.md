@@ -10,9 +10,11 @@ For nuking the device flash, refer to official documentation.
 
 ```
 1. setup.sh (initialise venv, requirements, and submodules)
-2. build.sh (build firmware, and mpy-cross)
+2. build.sh (build target port+board firmware, and mpy-cross)
 3. flash.sh (copy src to device)
 ```
+
+Something like `minicom -D /dev/ttyACM0 -b 112500` can be used to open REPL.
 
 ## Imports
 
@@ -29,7 +31,7 @@ Running `./build/mpy-cross foo.py` will output the mpy-file.
 ### Raspberry Pi Pico (RP2350 & RP2040)
 
 Hold BOOTSEL, and plug the device into a computer. Mount the block device into a path, and
-copy the `flash_nuke.uf2` into the blkdev root.
+copy `/fw/flash_nuke.uf2` into the blkdev root.
 
 [Documentation](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html#resetting-flash-memory)
 
