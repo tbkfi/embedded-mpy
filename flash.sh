@@ -52,6 +52,7 @@ copy_src() {
 			fi
 		fi
 	done
+	mpremote reset
 }
 
 echo "[FLASHING]"
