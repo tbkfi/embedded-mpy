@@ -40,6 +40,7 @@ build() {
 	echo "[BUILDING FIRMWARE AND TOOLS]"
 	echo -e "\n> BUILDING 'MPY-CROSS'" && build_mpycross
 	echo -e "\n> BUILDING 'FIRMWARE'" && build_firmware
+	echo -e "\nSCRIPT FINISHED"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then

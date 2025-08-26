@@ -73,7 +73,7 @@ flash() {
 	echo -e "\n> VENV" && source_venv
 	echo -e "\n> TOOLS" && check_requirements
 	echo -e "\n> COPYING SRC" && copy_src
-	echo "DONE"
+	echo -e "\nSCRIPT FINISHED"
 }
 
 
