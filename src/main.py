@@ -1,8 +1,8 @@
-import machine
+from machine import Pin
 import time
 
-led = machine.Pin(25, machine.Pin.OUT)
+blinky = Pin(25, Pin.OUT)
 
 while True:
-    led.toggle()
+    blinky.toggle()
     time.sleep(1)
