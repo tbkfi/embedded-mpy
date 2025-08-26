@@ -1,33 +1,48 @@
 #!/bin/bash
-# Build 'mpy-cross' and board 'firmware'
 
 build_mpycross() {
-	make -C ./fw/micropython/mpy-cross
+	if [[ -z "$PATH_MPY" ]]; then
+		echo "* PATH_MPY is unset!"
+		return 2
+	else
+		if [[ -d "$PATH_MPY/mpy-cross" ]]; then
+			make -C "$PATH_MPY/mpy-cross"
+		else 
+			echo "* MISSING BUILD TARGET !"
+			return 4
+		fi
+	fi
 }
 
 build_firmware() {
-# Select appropriate device 'port' and 'board' type (if needed) from
-# micropython submodule as the build target before invoking.
-#
-# see: https://github.com/micropython/micropython/tree/master/ports, for avail. options.
-#
-# Also required is the actual toolchain for the target arch (e.g. arm-none-eabi-gcc, ...).
-# This should be installled from your system repositories.
-	local FW_PORT="rp2"
-	local FW_BOARD="RPI_PICO"
-
-	echo "* PORT: $FW_PORT"
-	echo "* BOARD: $FW_BOARD"
-
-	# Does the specified port exist?
-	if [[ ! -d "./fw/micropython/ports/$FW_PORT" ]]; then
-		echo "Couldn't find '$FW_PORT' in the ports directory! Exiting ..."
-		exit 1
+# Building naturally requires the respective toolchain (e.g. arm-none-eabi-gcc)
+# for your target arch.
+	if [[ -z "$PATH_MPY" ]]; then
+		echo "* PATH_MPY is unset!"
+		return 2
+	fi
+	if [[ -z "$MPY_FW_PORT" ]]; then
+		echo "* MPY_FW_PORT is unset!"
+		return 2
+	fi
+	if [[ ! -d "$PATH_MPY/ports/$MPY_FW_PORT" ]]; then
+		echo "* MISSING PORT TARGET '$MPY_FW_PORT' !"
+		return 4
 	fi
 
-	make -C "./fw/micropython/ports/$FW_PORT" BOARD="$FW_BOARD"
+	echo "* PORT: $FW_PORT"
+	[[ ! -z "$MPY_FW_BOARD" ]] && echo "* BOARD: $MPY_FW_BOARD" || echo "* BOARD: UNSET"
+
+	make -C "$PATH_MPY/ports/$MPY_FW_PORT" BOARD="$MPY_FW_BOARD"
 }
 
-echo "[BUILDING FIRMWARE AND TOOLS]"
-echo -e "\n> BUILDING 'MPY-CROSS'" && build_mpycross
-echo -e "\n> BUILDING 'FIRMWARE'" && build_firmware
+build() {
+	echo "[BUILDING FIRMWARE AND TOOLS]"
+	echo -e "\n> BUILDING 'MPY-CROSS'" && build_mpycross
+	echo -e "\n> BUILDING 'FIRMWARE'" && build_firmware
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+	source .env || exit 1
+	build
+fi

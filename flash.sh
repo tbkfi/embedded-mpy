@@ -1,15 +1,16 @@
 #!/bin/bash
-# Copy files from '/src' to device.
-
 
 source_venv() {
-
-	local PATH_VENV="./.venv"
+# Work inside the project venv
 	echo -n "* Finding venv: "
+	if [[ -z "$PATH_VENV" ]]; then
+		echo "UNSET!"
+		return 2
+	fi
 	if [[ ! -d "$PATH_VENV" ]]; then
 		echo "FAIL!"
 		echo -e "\nMake sure python venv is up-to-date in '$PATH_VENV'!"
-		exit 1
+		return 4
 	else
 		echo "OK"
 
@@ -25,20 +26,32 @@ source_venv() {
 	fi
 }
 
-check_requirements() {
-# Make sure we have needed base tools
-
-	echo -n "* mpremote: "
-	if ! command -v mpremote > /dev/null 2>&1; then
+check_requirement() {
+	echo -n "* $1: "
+	if ! command -v "$1" > /dev/null 2>&1; then
 		echo "FAIL"
+		return 1
 	else
 		echo "OK"
+		return 0
 	fi
+}
+
+check_requirements() {
+# Make sure we have needed base tools
+	check_requirement "mpremote"
 }
 
 copy_src() {
 # Copy source files to device
-	local PATH_SRC="./src"
+	if [[ -z "$PATH_SRC" ]]; then
+		echo "* PATH_SRC is unset!"
+		return 2
+	fi
+	if [[ ! -d "$PATH_SRC" ]]; then
+		echo "* MISSING PATH_SRC !"
+		return 4
+	fi
 
 	# Flat copy
 	for F in "$PATH_SRC"/*.{py,mpy}; do
@@ -55,9 +68,16 @@ copy_src() {
 	mpremote reset
 }
 
-echo "[FLASHING]"
-echo -e "\n> VENV" && source_venv
-echo -e "\n> TOOLS" && check_requirements
-echo -e "\n> COPYING SRC" && copy_src
+flash() {
+	echo "[FLASHING]"
+	echo -e "\n> VENV" && source_venv
+	echo -e "\n> TOOLS" && check_requirements
+	echo -e "\n> COPYING SRC" && copy_src
+	echo "DONE"
+}
 
-echo "DONE"
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+	source .env || exit 1
+	flash
+fi

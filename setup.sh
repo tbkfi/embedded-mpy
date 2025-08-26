@@ -1,15 +1,20 @@
 #!/bin/bash
-BIN_PYTHON=""
-
 
 locate_python() {
 # Python runtime
-	if command -v python > /dev/null 2>&1; then
-		BIN_PYTHON="$(which python)"
-	elif command -v python3 > /dev/null 2>&1; then
-		BIN_PYTHON="$(which python3)"
-	else
-		echo "* Couldn't find python in PATH! Exiting ..."
+	if [[ -z "$BIN_PYTHON" ]]; then
+		if command -v python > /dev/null 2>&1; then
+			BIN_PYTHON="$(which python)"
+		elif command -v python3 > /dev/null 2>&1; then
+			BIN_PYTHON="$(which python3)"
+		else
+			echo "* Couldn't find python in PATH! Exiting ..."
+			exit 1
+		fi
+	fi
+
+	if [[ ! -x "$BIN_PYTHON" ]]; then
+		"* Target was not executable! Exiting ..."
 		exit 1
 	fi
 	echo "* $($BIN_PYTHON --version) @ \"$(echo $BIN_PYTHON)\""
@@ -17,18 +22,13 @@ locate_python() {
 
 setup_venv() {
 # Create or Update the venv
-	local PATH_VENV="./.venv"
-	local PATH_REQ_BASE="./requirements.txt"
-	local PATH_REQ_CUSTOM="./src/requirements.txt"
-
-	# Virtual Environment
 	echo -n "* Locating venv ... "
 	if [[ ! -d "$PATH_VENV" ]]; then
 		echo "MISSING"
 		
 		echo -n "* Creating virtual environment ... " \
 			&& $BIN_PYTHON -m venv "$PATH_VENV" > /dev/null 2>&1
-
+		
 		if (( $? )); then
 			echo "FAIL"
 			exit 1
@@ -41,7 +41,6 @@ setup_venv() {
 	
 	# Source virtual environment
 	source "$PATH_VENV/bin/activate"
-	
 	if (( $? )); then
 		echo "Failed sourcing VENV! Exiting ..."
 		exit 1
@@ -111,12 +110,15 @@ fetch_src() {
 	echo "DONE"
 }
 
+setup() {
+	echo -e "[PROJECT SETUP]"
+	echo -e "\n> Python bin" && locate_python
+	echo -e "\n> Virtual Environment" && setup_venv
+	echo -e "\n> Git" && fetch_src
+	echo -e "\nSCRIPT FINISHED"
+}
 
-# RUN
-echo -e "[PROJECT SETUP]"
-
-echo -e "\n> Python bin" && locate_python
-echo -e "\n> Virtual Environment" && setup_venv
-echo -e "\n> GIT" && fetch_src
-
-echo -e "\nSCRIPT FINISHED"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+	source .env || exit 1
+	setup
+fi
