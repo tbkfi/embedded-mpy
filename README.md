@@ -4,9 +4,13 @@ An empty project template for micropython projects.
 
 ## Usage
 
+Firstly `cp ./.env.template ./.env`, and modify the variables to suit your target device and environment.
+If the `.env` file is not present, the helper scripts will complain and quit.
+
 You must have the appropriate toolchain installed to use the `build.sh` script, everything else should be handled.
 
-For nuking the device flash, refer to official documentation.
+You may wish to reset the device flash before starting a new project, to do this refer to the board's official documentation.
+Or see if the "Flash Reset" section has an entry for your board.
 
 ```
 1. setup.sh (initialise venv, requirements, and submodules)
@@ -14,7 +18,8 @@ For nuking the device flash, refer to official documentation.
 3. flash.sh (copy src to device)
 ```
 
-Something like `minicom -D /dev/ttyACM0 -b 112500` can be used to open REPL.
+Something like `minicom -D /dev/ttyACM0 -b 112500` can be used to open REPL, which is a good way to
+test if the firmware was flashed and functions correctly if you don't have a led for blinky, for example.
 
 ## Imports
 
@@ -34,6 +39,12 @@ Hold BOOTSEL, and plug the device into a computer. Mount the block device into a
 copy `/fw/flash_nuke.uf2` into the blkdev root.
 
 [Documentation](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html#resetting-flash-memory)
+
+## Why?
+
+A low threshold to get started on a project, and a reliable base to iterate on makes development easier to start and continue.
+As someone who prefers the CLI, and doesn't use heavier IDEs for programming (neovim btw), this was a simple way to create a relatively standard
+layout for interfacing with an embedded device while minimising the dependencies and unneeded middleware.
 
 ## License
 
