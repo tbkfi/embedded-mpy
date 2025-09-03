@@ -13,6 +13,8 @@ You may wish to reset the device flash before starting a new project, to do this
 Or see if the "Flash Reset" section has an entry for your board.
 
 ```
+Run in order to initialise!
+
 1. setup.sh (initialise venv, requirements, and submodules)
 2. build.sh (build target port+board firmware, and mpy-cross)
 3. flash.sh (copy src to device)
