@@ -1,7 +1,7 @@
 from machine import Pin
 import time
 
-blinky = Pin(25, Pin.OUT)
+blinky = Pin("LED", Pin.OUT)
 
 while True:
     blinky.toggle()
